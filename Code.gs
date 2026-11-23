@@ -1,5 +1,5 @@
 // Google Apps Script — Google Sheet-এ ইউজার ডাটা জমা রাখে (GitHub Pages-এর ব্যাকএন্ড)
-var ADMIN_PASSWORD = "admin123";            // <-- এটি অবশ্যই বদলে নিন
+var ADMIN_PASSWORD = "QR_Code_Generator@";            // <-- এটি অবশ্যই বদলে নিন
 var SITE_NAME = "QR স্টুডিও";                 // ইমেইলে যে নাম দেখাবে
 var SHEET_NAME = "Users";
 var HEADERS = ["User ID", "Email", "Password", "Status", "Signup Time", "Last Login", "Session Token"];
