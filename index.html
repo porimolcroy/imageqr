@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>লগইন</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+body{min-height:100vh;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr)}
+.hero{position:relative;overflow:hidden;color:#fff;padding:56px 48px;display:flex;flex-direction:column;justify-content:center;
+  background:radial-gradient(900px 500px at 10% 0%,rgba(59,130,246,.55),transparent 60%),linear-gradient(150deg,#172554 0%,#1e40af 58%,#0e7490 100%)}
+.hero-in{position:relative;z-index:1;max-width:520px}
+.brand.light{color:#fff;margin-bottom:34px}
+.hero h1{font-size:36px;line-height:1.28;margin:0 0 12px;font-weight:700}
+.lead{font-size:16px;opacity:.88;margin:0 0 26px}
+.feat{list-style:none;padding:0;margin:0;display:grid;gap:13px}
+.feat li{display:flex;gap:10px;align-items:flex-start;font-size:15px;opacity:.96}
+.feat li::before{content:"✓";flex:none;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.2);display:grid;place-items:center;font-size:13px;font-weight:700;margin-top:1px}
+.art{position:absolute;right:-40px;bottom:-40px;opacity:.13;transform:rotate(-8deg);pointer-events:none}
+.art svg{width:320px;height:320px;display:block}
+
+.panel{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 18px}
+.box{width:100%;max-width:430px;padding:30px 28px}
+.seg2{display:flex;background:#f1f5f9;border-radius:12px;padding:4px;margin-bottom:22px}
+.seg2 button{flex:1;padding:10px;border:0;background:none;border-radius:9px;font:600 14.5px var(--font);color:var(--muted);cursor:pointer}
+.seg2 button.on{background:#fff;color:var(--brand);box-shadow:0 1px 3px rgba(15,23,42,.12)}
+.box h2{margin:0 0 4px;font-size:22px;color:var(--brand-dark)}
+.sub{margin:0 0 20px;color:var(--muted);font-size:14px}
+.pwwrap{position:relative}
+.pwwrap .input{padding-right:46px}
+.eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:none;cursor:pointer;font-size:17px;padding:6px;opacity:.7}
+.eye:hover{opacity:1}
+.btn.block{width:100%;padding:13px;font-size:15.5px;margin-top:4px}
+.center{text-align:center;font-size:14px;margin:16px 0 0}
+.done{text-align:center}
+.done .tick{width:60px;height:60px;border-radius:50%;background:var(--ok-bg);color:var(--ok);display:grid;place-items:center;font-size:30px;margin:0 auto 12px}
+.uidbox{background:#f1f5f9;border:1px dashed #94a3b8;border-radius:12px;padding:12px;margin:14px 0 6px;font-size:13px;color:var(--muted)}
+.uidbox b{display:block;font-size:24px;color:var(--brand-dark);letter-spacing:1px}
+.note{font-size:13px;color:var(--muted);margin:0 0 16px}
+.panel .site-foot{padding-bottom:0}
+@media(max-width:860px){
+  body{grid-template-columns:1fr}
+  .hero{padding:26px 22px}
+  .hero h1{font-size:24px;margin-bottom:6px}
+  .brand.light{margin-bottom:16px}
+  .lead{margin:0}
+  .feat,.art{display:none}
+  .panel{padding:20px 14px 28px}
+  .box{padding:24px 20px}
+}
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-in">
+    <div class="brand light"><span class="logo-mark" data-logo></span><span data-brand></span></div>
+    <h1>এক্সেলের তালিকা থেকে<br>মুহূর্তে QR কোড</h1>
+    <p class="lead" data-tagline></p>
+    <ul class="feat">
+      <li>এক্সেলের প্রথম কলাম থেকে একসাথে শত শত QR কোড</li>
+      <li>QR এর মাঝে নিজের ছবি/লোগো — সাইজ, অপাসিটি ও অবস্থান ঠিক করা যায়</li>
+      <li>১০০+ অক্ষরের বড় লেখা এবং বাংলা লেখাও সাপোর্ট করে</li>
+      <li>QR কোড ও ব্যাকগ্রাউন্ডের রং নিজের মনের মতো বদলানো যায়</li>
+      <li>A4 পাতায় প্রিন্টের জন্য তৈরি লেআউট</li>
+    </ul>
+  </div>
+  <div class="art" aria-hidden="true"><svg viewBox="-1 -1 23 23" xmlns="http://www.w3.org/2000/svg"><rect x="-1" y="-1" width="23" height="23" rx="2" fill="#fff"/><g fill="#172554"><rect x="0" y="0" width="7" height="1"/><rect x="8" y="0" width="1" height="1"/><rect x="11" y="0" width="1" height="1"/><rect x="14" y="0" width="7" height="1"/><rect x="0" y="1" width="1" height="1"/><rect x="6" y="1" width="1" height="1"/><rect x="9" y="1" width="1" height="1"/><rect x="14" y="1" width="1" height="1"/><rect x="20" y="1" width="1" height="1"/><rect x="0" y="2" width="1" height="1"/><rect x="2" y="2" width="3" height="1"/><rect x="6" y="2" width="1" height="1"/><rect x="8" y="2" width="3" height="1"/><rect x="14" y="2" width="1" height="1"/><rect x="16" y="2" width="3" height="1"/><rect x="20" y="2" width="1" height="1"/><rect x="0" y="3" width="1" height="1"/><rect x="2" y="3" width="3" height="1"/><rect x="6" y="3" width="1" height="1"/><rect x="8" y="3" width="1" height="1"/><rect x="14" y="3" width="1" height="1"/><rect x="16" y="3" width="3" height="1"/><rect x="20" y="3" width="1" height="1"/><rect x="0" y="4" width="1" height="1"/><rect x="2" y="4" width="3" height="1"/><rect x="6" y="4" width="1" height="1"/><rect x="8" y="4" width="2" height="1"/><rect x="11" y="4" width="2" height="1"/><rect x="14" y="4" width="1" height="1"/><rect x="16" y="4" width="3" height="1"/><rect x="20" y="4" width="1" height="1"/><rect x="0" y="5" width="1" height="1"/><rect x="6" y="5" width="1" height="1"/><rect x="8" y="5" width="4" height="1"/><rect x="14" y="5" width="1" height="1"/><rect x="20" y="5" width="1" height="1"/><rect x="0" y="6" width="7" height="1"/><rect x="12" y="6" width="1" height="1"/><rect x="14" y="6" width="7" height="1"/><rect x="8" y="7" width="1" height="1"/><rect x="0" y="8" width="4" height="1"/><rect x="5" y="8" width="1" height="1"/><rect x="7" y="8" width="1" height="1"/><rect x="10" y="8" width="2" height="1"/><rect x="13" y="8" width="1" height="1"/><rect x="15" y="8" width="2" height="1"/><rect x="19" y="8" width="2" height="1"/><rect x="0" y="9" width="1" height="1"/><rect x="3" y="9" width="4" height="1"/><rect x="8" y="9" width="1" height="1"/><rect x="10" y="9" width="2" height="1"/><rect x="13" y="9" width="1" height="1"/><rect x="15" y="9" width="4" height="1"/><rect x="0" y="10" width="1" height="1"/><rect x="2" y="10" width="2" height="1"/><rect x="6" y="10" width="1" height="1"/><rect x="8" y="10" width="2" height="1"/><rect x="11" y="10" width="4" height="1"/><rect x="16" y="10" width="1" height="1"/><rect x="18" y="10" width="2" height="1"/><rect x="3" y="11" width="2" height="1"/><rect x="7" y="11" width="2" height="1"/><rect x="11" y="11" width="1" height="1"/><rect x="15" y="11" width="3" height="1"/><rect x="19" y="11" width="1" height="1"/><rect x="0" y="12" width="1" height="1"/><rect x="3" y="12" width="2" height="1"/><rect x="6" y="12" width="2" height="1"/><rect x="11" y="12" width="1" height="1"/><rect x="13" y="12" width="7" height="1"/><rect x="8" y="13" width="2" height="1"/><rect x="15" y="13" width="3" height="1"/><rect x="0" y="14" width="7" height="1"/><rect x="8" y="14" width="1" height="1"/><rect x="12" y="14" width="1" height="1"/><rect x="14" y="14" width="1" height="1"/><rect x="0" y="15" width="1" height="1"/><rect x="6" y="15" width="1" height="1"/><rect x="9" y="15" width="1" height="1"/><rect x="13" y="15" width="1" height="1"/><rect x="18" y="15" width="1" height="1"/><rect x="0" y="16" width="1" height="1"/><rect x="2" y="16" width="3" height="1"/><rect x="6" y="16" width="1" height="1"/><rect x="8" y="16" width="1" height="1"/><rect x="13" y="16" width="1" height="1"/><rect x="16" y="16" width="1" height="1"/><rect x="18" y="16" width="1" height="1"/><rect x="20" y="16" width="1" height="1"/><rect x="0" y="17" width="1" height="1"/><rect x="2" y="17" width="3" height="1"/><rect x="6" y="17" width="1" height="1"/><rect x="10" y="17" width="1" height="1"/><rect x="15" y="17" width="3" height="1"/><rect x="19" y="17" width="2" height="1"/><rect x="0" y="18" width="1" height="1"/><rect x="2" y="18" width="3" height="1"/><rect x="6" y="18" width="1" height="1"/><rect x="10" y="18" width="1" height="1"/><rect x="12" y="18" width="1" height="1"/><rect x="14" y="18" width="2" height="1"/><rect x="19" y="18" width="1" height="1"/><rect x="0" y="19" width="1" height="1"/><rect x="6" y="19" width="1" height="1"/><rect x="8" y="19" width="2" height="1"/><rect x="15" y="19" width="6" height="1"/><rect x="0" y="20" width="7" height="1"/><rect x="10" y="20" width="1" height="1"/><rect x="13" y="20" width="3" height="1"/><rect x="17" y="20" width="1" height="1"/><rect x="20" y="20" width="1" height="1"/></g></svg></div>
+</section>
+
+<section class="panel">
+  <div class="box card">
+
+    <div id="tabs" class="seg2" role="tablist">
+      <button id="tS" class="on" onclick="tab('s')">সাইন আপ</button>
+      <button id="tL" onclick="tab('l')">লগইন</button>
+    </div>
+
+    <!-- সাইন আপ / লগইন ফর্ম -->
+    <div id="form">
+      <h2 id="ttl">নতুন অ্যাকাউন্ট খুলুন</h2>
+      <p class="sub" id="sub">ইমেইল ও পাসওয়ার্ড দিয়ে শুরু করুন</p>
+      <div class="field">
+        <label for="email">ইমেইল</label>
+        <input class="input" id="email" type="email" placeholder="example@gmail.com" autocomplete="email" inputmode="email">
+      </div>
+      <div class="field">
+        <label for="pw">পাসওয়ার্ড <span class="hint" id="pwHint">(কমপক্ষে ৬ অক্ষর)</span></label>
+        <div class="pwwrap">
+          <input class="input" id="pw" type="password" autocomplete="new-password">
+          <button type="button" class="eye" onclick="togglePw()" aria-label="পাসওয়ার্ড দেখান/লুকান">👁</button>
+        </div>
+      </div>
+      <button class="btn block" id="go" onclick="submitForm()">সাইন আপ করুন</button>
+      <p class="center"><a href="#" onclick="showForgot();return false">User ID / পাসওয়ার্ড ভুলে গেছেন?</a></p>
+    </div>
+
+    <!-- ভুলে গেলে -->
+    <div id="fp" class="hide">
+      <h2>তথ্য ফিরে পান</h2>
+      <p class="sub">নিবন্ধিত ইমেইল দিন, User ID ও পাসওয়ার্ড সেই ইমেইলে পাঠানো হবে।</p>
+      <div class="field">
+        <label for="fpEmail">নিবন্ধিত ইমেইল</label>
+        <input class="input" id="fpEmail" type="email" placeholder="example@gmail.com" autocomplete="email" inputmode="email">
+      </div>
+      <button class="btn block" id="fpGo" onclick="sendForgot()">ইমেইলে তথ্য পাঠান</button>
+      <p class="center"><a href="#" onclick="hideForgot();return false">← ফিরে যান</a></p>
+    </div>
+
+    <!-- অ্যাকাউন্ট চালু: ইমেইল থেকে User ID কপি করে বসান -->
+    <div id="act" class="hide">
+      <h2>অ্যাকাউন্ট চালু করুন</h2>
+      <p class="sub"><b id="actEmail"></b> ঠিকানায় আপনার User ID পাঠানো হয়েছে। ইমেইল (Inbox/Spam) থেকে সেটি কপি করে নিচে বসান।</p>
+      <div class="field">
+        <label for="actId">ইমেইলে পাওয়া User ID</label>
+        <input class="input" id="actId" type="text" placeholder="যেমন: U7K3M9Q" autocomplete="off" autocapitalize="characters" spellcheck="false">
+      </div>
+      <button class="btn block" id="actGo" onclick="doActivate()">চালু করুন</button>
+      <p class="center"><a href="#" onclick="resendId();return false">ইমেইল পাননি? আবার পাঠান</a></p>
+      <p class="center"><a href="#" onclick="hideAct();return false">← ফিরে যান</a></p>
+    </div>
+
+    <div id="msg" role="alert"></div>
+  </div>
+  <div class="site-foot">© <span data-year></span> <span data-brand></span> &nbsp;·&nbsp; <a href="admin.html" style="color:inherit">অ্যাডমিন</a></div>
+</section>
+
+<script src="config.js"></script>
+<script>
+fillBrand('লগইন / সাইন আপ');
+const $ = id => document.getElementById(id);
+const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+let mode = 's';
+
+function setMsg(type, text) {
+  const m = $('msg');
+  if (!text) { m.className = ''; m.textContent = ''; return; }
+  m.className = 'alert ' + type;
+  m.textContent = text;
+}
+function goLabel() { return mode === 's' ? 'সাইন আপ করুন' : 'লগইন করুন'; }
+
+function tab(m) {
+  mode = m;
+  $('tS').classList.toggle('on', m === 's');
+  $('tL').classList.toggle('on', m === 'l');
+  $('ttl').textContent = m === 's' ? 'নতুন অ্যাকাউন্ট খুলুন' : 'আবার স্বাগতম';
+  $('sub').textContent = m === 's' ? 'ইমেইল ও পাসওয়ার্ড দিয়ে শুরু করুন' : 'আপনার ইমেইল ও পাসওয়ার্ড দিয়ে প্রবেশ করুন';
+  $('pwHint').style.display = m === 's' ? '' : 'none';
+  $('pw').setAttribute('autocomplete', m === 's' ? 'new-password' : 'current-password');
+  $('go').textContent = goLabel();
+  setMsg('', '');
+}
+
+function togglePw() { const p = $('pw'); p.type = p.type === 'password' ? 'text' : 'password'; }
+
+async function submitForm() {
+  const email = $('email').value.trim(), pw = $('pw').value;
+  if (!EMAIL_RE.test(email)) { setMsg('err', 'সঠিক ইমেইল দিন।'); $('email').focus(); return; }
+  if (mode === 's' && pw.length < 6) { setMsg('err', 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।'); $('pw').focus(); return; }
+  if (!pw) { setMsg('err', 'পাসওয়ার্ড দিন।'); $('pw').focus(); return; }
+
+  setMsg('', '');
+  $('go').disabled = true;
+  $('go').innerHTML = '<span class="spin"></span> অপেক্ষা করুন...';
+  const d = await api({ action: mode === 's' ? 'signup' : 'login', email: email, password: pw });
+  $('go').disabled = false;
+  $('go').textContent = goLabel();
+
+  if (d.pending) {                                                  // সাইন আপ (বা চালু-না-হওয়া লগইন): ইমেইলের ID বসাতে হবে
+    showAct(email, mode === 's' ? 'ok' : 'info', mode === 's' ? 'User ID ইমেইলে পাঠানো হয়েছে।' : d.error);
+    return;
+  }
+  if (!d.ok) { setMsg('err', d.error || 'সমস্যা হয়েছে, আবার চেষ্টা করুন।'); return; }
+  startSession(d);
+  location.href = 'main.html';
+}
+
+let actEmail = '';
+function showAct(email, type, text) {
+  actEmail = email;
+  $('actEmail').textContent = email;
+  $('actId').value = '';
+  $('form').classList.add('hide'); $('tabs').classList.add('hide'); $('fp').classList.add('hide');
+  $('act').classList.remove('hide');
+  setMsg(type, text);
+  $('actId').focus();
+}
+function hideAct() {
+  $('act').classList.add('hide');
+  $('form').classList.remove('hide'); $('tabs').classList.remove('hide'); setMsg('', '');
+}
+async function doActivate() {
+  const id = $('actId').value.trim();
+  if (!id) { setMsg('err', 'ইমেইল থেকে কপি করা User ID বসান।'); $('actId').focus(); return; }
+  setMsg('', '');
+  $('actGo').disabled = true;
+  $('actGo').innerHTML = '<span class="spin"></span> অপেক্ষা করুন...';
+  const d = await api({ action: 'activate', email: actEmail, user_id: id });
+  $('actGo').disabled = false;
+  $('actGo').textContent = 'চালু করুন';
+  if (!d.ok) { setMsg('err', d.error || 'সমস্যা হয়েছে, আবার চেষ্টা করুন।'); return; }
+  startSession(d);
+  location.href = 'main.html';
+}
+async function resendId() {
+  setMsg('', '');
+  const d = await api({ action: 'resend', email: actEmail });
+  setMsg(d.ok ? 'ok' : 'err', d.ok ? d.msg : d.error);
+}
+
+function showForgot() {
+  $('form').classList.add('hide'); $('tabs').classList.add('hide');
+  $('fp').classList.remove('hide'); setMsg('', '');
+  $('fpEmail').value = $('email').value;
+}
+function hideForgot() {
+  $('fp').classList.add('hide');
+  $('form').classList.remove('hide'); $('tabs').classList.remove('hide'); setMsg('', '');
+}
+async function sendForgot() {
+  const email = $('fpEmail').value.trim();
+  if (!EMAIL_RE.test(email)) { setMsg('err', 'সঠিক ইমেইল দিন।'); return; }
+  setMsg('', '');
+  $('fpGo').disabled = true;
+  $('fpGo').innerHTML = '<span class="spin"></span> অপেক্ষা করুন...';
+  const d = await api({ action: 'forgot', email: email });
+  $('fpGo').disabled = false;
+  $('fpGo').textContent = 'ইমেইলে তথ্য পাঠান';
+  setMsg(d.ok ? 'ok' : 'err', d.ok ? d.msg : d.error);
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  if (!$('act').classList.contains('hide')) doActivate();
+  else if (!$('form').classList.contains('hide')) submitForm();
+  else if (!$('fp').classList.contains('hide')) sendForgot();
+});
+
+// আগে থেকে লগইন থাকলে সরাসরি ড্যাশবোর্ডে
+(async () => {
+  const t = localStorage.getItem('token');
+  if (!t) return;
+  setMsg('info', 'আগের লগইন যাচাই করা হচ্ছে...');
+  const d = await api({ action: 'verify', token: t });
+  if (d.ok) { startSession({ token: t, user_id: d.user_id, email: d.email }); location.replace('main.html'); }
+  else setMsg('', '');
+})();
+</script>
+</body>
+</html>

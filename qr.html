@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR জেনারেটর</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<!-- qrcode-generator: ভার্সন ৪০ পর্যন্ত সাপোর্ট করে, তাই বড় লেখাও (১০০+ শব্দ/অক্ষর) QR হবে -->
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+body{padding-bottom:210px}
+.page{max-width:1100px;margin:0 auto;padding:20px 16px 0}
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.page-head h1{margin:0;font-size:22px;color:var(--brand-dark)}
+.page-head p{margin:2px 0 0;color:var(--muted);font-size:13.5px}
+#status{font-size:13px;min-height:20px;color:var(--ok);font-weight:600}
+#status.err{color:var(--bad)}
+.grid-container{--cols:4;display:grid;grid-template-columns:repeat(var(--cols),1fr);gap:10px;margin:0 auto}
+.qrcode-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center;display:flex;flex-direction:column;justify-content:flex-start;align-items:center;min-width:0;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+.input-box{width:100%;padding:8px 10px;border:1px solid #cbd5e1;border-radius:8px;font:13px var(--font);outline:none;margin-bottom:2px;resize:vertical;background:#fff}
+.input-box:focus{border-color:var(--brand-2);box-shadow:0 0 0 3px rgba(37,99,235,.15)}
+.counter{font-size:11px;color:var(--muted);margin-bottom:6px;align-self:flex-end}
+.qr-box{display:flex;justify-content:center;align-items:center;width:100%;min-height:60px}
+.qr-canvas{width:100%;max-width:300px;height:auto;image-rendering:pixelated;display:block}
+.caption{font-size:9px;color:#334155;margin-top:4px;width:100%;word-break:break-word;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;line-height:1.3;text-align:var(--cap-align,center)}
+.caption b{color:var(--brand-2)}
+body.hide-text .caption{display:none}
+body.full-text .caption{display:block;-webkit-line-clamp:unset;overflow:visible}
+.qr-err{color:var(--bad);font-size:11px}
+.seg{display:inline-flex;vertical-align:middle}
+.seg button{padding:4px 11px;font-size:12px;background:#e2e8f0;color:#334155;border-radius:0;border-right:1px solid #fff}
+.seg button:first-child{border-radius:7px 0 0 7px}
+.seg button:last-child{border-radius:0 7px 7px 0;border-right:none}
+.seg button.active{background:var(--brand-2);color:#fff}
+
+.controls{text-align:center;padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));position:fixed;bottom:0;left:0;right:0;z-index:30;background:rgba(255,255,255,.96);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-top:1px solid var(--line);box-shadow:0 -8px 24px rgba(15,23,42,.08)}
+.btn-row{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px}
+.opt-row{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px 16px;margin-top:8px;font-size:12.5px;color:#334155}
+.opt-row label{display:flex;align-items:center;gap:5px;cursor:pointer}
+.opt-row select{padding:3px 6px;font-size:12.5px;border:1px solid #cbd5e1;border-radius:6px;font-family:inherit}
+button{padding:8px 15px;cursor:pointer;border-radius:9px;border:none;font:600 13px var(--font)}
+.add-btn{background:#16a34a;color:#fff}.excel-btn{background:#0891b2;color:#fff}.logo-btn{background:#ea580c;color:#fff}
+.print-btn{background:#2563eb;color:#fff}.inventor-btn{background:#64748b;color:#fff}.clear-btn{background:#dc2626;color:#fff}
+.sm-btn{padding:6px 12px;font-size:12px;background:#64748b;color:#fff;margin-right:4px}
+
+.modal{display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background:rgba(15,23,42,.55);justify-content:center;align-items:center;padding:12px}
+.modal-content{background:#fff;padding:22px;border-radius:14px;width:320px;max-width:100%;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.close-btn{background:#dc2626;color:#fff;padding:7px 14px;margin-top:14px;border-radius:9px}
+#logoModal .modal-content{width:min(700px,100%);max-height:92vh;overflow:auto;text-align:left;padding:18px}
+#logoModal h3{margin:0 0 12px;text-align:center;color:var(--brand-dark)}
+.lm-wrap{display:flex;flex-wrap:wrap;gap:16px}
+.lm-left{flex:1 1 240px;min-width:220px;text-align:center}
+.lm-right{flex:1 1 270px;min-width:240px}
+.pv-box{border:1px solid var(--line);border-radius:10px;background:#fff;touch-action:none;cursor:grab;line-height:0;user-select:none;-webkit-user-select:none;overflow:hidden}
+.pv-box.drag{cursor:grabbing}
+.pv-box canvas{width:100%;height:auto;display:block;image-rendering:pixelated;pointer-events:none}
+.pv-warn{font-size:12px;margin-top:6px;min-height:34px}
+.pv-warn.bad{color:var(--bad)}.pv-warn.ok{color:var(--ok)}
+.pv-hint{font-size:11px;color:var(--muted)}
+.drop{border:2px dashed var(--brand-2);border-radius:10px;padding:14px;text-align:center;color:var(--brand-2);cursor:pointer;background:#f5f9ff;font-size:13px}
+.drop.over{background:#e3efff}
+.lm-info{font-size:12px;color:#475569;margin:6px 0;min-height:16px}
+.lm-info.err{color:var(--bad)}
+.ctl{display:flex;align-items:center;gap:6px;font-size:13px;margin:9px 0;flex-wrap:wrap}
+.ctl input[type=range]{flex:1 1 120px}
+.ctl .v{min-width:38px;text-align:right;color:var(--brand-2);font-weight:700}
+.pos-grid{display:grid;grid-template-columns:repeat(3,36px);gap:4px}
+.pos-grid button{padding:6px 0;background:#e2e8f0;color:#334155;font-size:15px;border-radius:7px}
+.lm-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px}
+
+.color-row{margin-top:6px}
+.color-row input[type=color]{width:34px;height:26px;padding:0;border:1px solid #cbd5e1;border-radius:6px;background:#fff;cursor:pointer;vertical-align:middle}
+.presets{display:inline-flex;gap:5px;align-items:center}
+.presets button{width:24px;height:24px;padding:0;border-radius:6px;border:1px solid #94a3b8;position:relative;overflow:hidden}
+.cwarn{font-size:12px;font-weight:600}
+.cwarn.ok{color:var(--ok)}.cwarn.bad{color:var(--bad)}
+
+@media(max-width:640px){.page-head h1{font-size:19px}}
+@media print{
+  @page{size:A4;margin:8mm}
+  body{background:#fff;padding:0}
+  .no-print{display:none!important}
+  .page{padding:0;max-width:none}
+  .grid-container{gap:4mm;max-width:none}
+  .qrcode-card{border:.1px solid #aaa;padding:3mm;border-radius:0;box-shadow:none;break-inside:avoid;page-break-inside:avoid}
+  .qr-canvas{max-width:100%;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body class="gate">
+<header class="appbar no-print">
+  <div class="appbar-in">
+    <a class="brand" href="main.html"><span class="logo-mark" data-logo></span><span data-brand></span></a>
+    <nav class="app-nav">
+      <a class="navlink" href="main.html">ড্যাশবোর্ড</a>
+      <a class="navlink active" href="qr.html">QR জেনারেটর</a>
+    </nav>
+    <div class="app-user">
+      <span class="chip" id="who"></span>
+      <button class="btn ghost sm" onclick="logout()">লগআউট</button>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+  <div class="page-head no-print">
+    <div>
+      <h1>QR কোড জেনারেটর</h1>
+      <p>এক্সেল ফাইলের প্রথম কলামের প্রতিটি ঘরের লেখা আলাদা QR কোডে রূপান্তর হবে</p>
+    </div>
+    <div id="status"></div>
+  </div>
+  <div id="qrcode-grid" class="grid-container"></div>
+</main>
+
+<div class="no-print controls">
+  <div class="btn-row">
+    <button class="add-btn" onclick="addNewField()">+ নতুন কোড</button>
+    <button class="excel-btn" onclick="document.getElementById('excelFile').click()">📂 এক্সেল ফাইল</button>
+    <button class="logo-btn" onclick="openLogoModal()">🖼 ছবি সেটিংস</button>
+    <button class="print-btn" onclick="window.print()">প্রিন্ট (A4)</button>
+    <button class="inventor-btn" onclick="openInventorModal()">উদ্ভাবক</button>
+    <button class="clear-btn" onclick="clearAll()">সব মুছুন</button>
+  </div>
+  <div class="opt-row">
+    <label><input type="checkbox" id="optHeader"> প্রথম সারি হেডার (বাদ যাবে)</label>
+    <label><input type="checkbox" id="optLogo" checked onchange="toggleLogo()"> মাঝে ছবি</label>
+    <label><input type="checkbox" id="optText" checked onchange="toggleText()"> নিচে লেখা দেখান</label>
+    <label>প্রতি সারিতে
+      <select id="optCols" onchange="changeCols()">
+        <option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option>
+      </select> টি
+    </label>
+    <span>লেখার অ্যালাইনমেন্ট:
+      <span class="seg" id="alignSeg">
+        <button data-a="left" onclick="setAlign('left')">বামে</button>
+        <button data-a="center" onclick="setAlign('center')">মাঝে</button>
+        <button data-a="right" onclick="setAlign('right')">ডানে</button>
+        <button data-a="justify" onclick="setAlign('justify')">সমান</button>
+      </span>
+    </span>
+    <label><input type="checkbox" id="optFull" onchange="toggleFull()"> পুরো লেখা দেখান</label>
+  </div>
+  <div class="opt-row color-row">
+    <span>🎨 QR এর রং:</span>
+    <label>কোডের রং <input type="color" id="cFg" value="#000000"></label>
+    <label>ব্যাকগ্রাউন্ড <input type="color" id="cBg" value="#ffffff"></label>
+    <span id="cPresets" class="presets" title="তৈরি রং বেছে নিন"></span>
+    <button class="sm-btn" onclick="resetColors()">রং রিসেট</button>
+    <span id="cWarn" class="cwarn"></span>
+  </div>
+  <input type="file" id="excelFile" accept=".xlsx,.xls,.csv,.ods" style="display:none" onchange="handleExcel(this)">
+</div>
+
+<!-- ===== ছবি সেটিংস ===== -->
+<div id="logoModal" class="modal no-print">
+  <div class="modal-content">
+    <h3>🖼 QR এর ছবি — আপলোড, সাইজ, অপাসিটি, অবস্থান</h3>
+    <div class="lm-wrap">
+      <div class="lm-left">
+        <div id="pvBox" class="pv-box"></div>
+        <div id="pvWarn" class="pv-warn"></div>
+        <div class="pv-hint">👆 প্রিভিউতে ছবি টেনে (drag) যেখানে খুশি বসাতে পারেন</div>
+      </div>
+      <div class="lm-right">
+        <div class="drop" id="logoDrop">ছবি আপলোড করুন (যেকোনো ছবি) — ক্লিক করুন বা টেনে এনে ছাড়ুন
+          <input type="file" id="logoFile" accept="image/*" hidden>
+        </div>
+        <div id="logoInfo" class="lm-info">এখনো কোনো ছবি নেই — আপলোড করুন।</div>
+        <div><button class="sm-btn" onclick="removeLogo()">🗑 ছবি সরান</button></div>
+
+        <div class="ctl"><label><input type="checkbox" id="pvAuto"> স্বয়ংক্রিয় সাইজ (স্ক্যান-নিরাপদ)</label></div>
+        <div class="ctl">সাইজ <input type="range" id="pvSize" min="5" max="50" step="1"> <span class="v" id="pvSizeV"></span></div>
+        <div class="ctl">অপাসিটি <input type="range" id="pvOp" min="10" max="100" step="5"> <span class="v" id="pvOpV"></span></div>
+        <div class="ctl"><label><input type="checkbox" id="pvBg"> ছবির পেছনে সাদা জমি</label></div>
+
+        <div class="ctl" style="align-items:flex-start">
+          <div>অবস্থান<div class="pos-grid" id="posGrid" style="margin-top:4px"></div></div>
+          <div style="flex:1 1 130px">
+            <div class="ctl" style="margin:0 0 6px">ডানে-বামে <input type="range" id="pvX" min="0" max="100" step="1"></div>
+            <div class="ctl" style="margin:0">উপরে-নিচে <input type="range" id="pvY" min="0" max="100" step="1"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="lm-actions">
+      <button class="add-btn" onclick="applyLogoSettings()">✔ সব QR এ প্রয়োগ করুন</button>
+      <button class="inventor-btn" onclick="resetLogoSettings()">রিসেট</button>
+      <button class="close-btn" style="margin-top:0;padding:8px 16px" onclick="closeLogoModal()">বন্ধ করুন</button>
+    </div>
+  </div>
+</div>
+
+<div id="inventorModal" class="modal">
+  <div class="modal-content">
+    <h3>উদ্ভাবক পরিচিতি</h3>
+    <p>পরিমল চন্দ্র রায় <br><a href="mailto:porimolcroy@gmail.com" style="color:#007bff;text-decoration:none;">porimolcroy@gmail.com</a></p>
+    <p><a href="https://yourwebsite.com" target="_blank" style="color:#007bff;text-decoration:none;font-weight:bold;">ওয়েবসাইট ভিজিট করুন</a></p>
+    <button class="close-btn" onclick="closeInventorModal()">বন্ধ করুন</button>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script>
+// বাংলা/ইউনিকোড লেখার জন্য UTF-8 বাইট
+qrcode.stringToBytes = function (s) { return Array.from(new TextEncoder().encode(s)); };
+
+const $ = id => document.getElementById(id);
+let count = 0;
+
+/* ---------- ছবির সেটিংস ---------- */
+// size: ছবির লম্বা দিক = QR এর কত %; opacity: ১০–১০০; x,y: ছবির কেন্দ্র QR এর কত % জায়গায়
+const DEFAULTS = { on: true, auto: true, size: 30, opacity: 100, x: 50, y: 50, bg: true };
+let cfg = Object.assign({}, DEFAULTS);     // সব QR এ যেটা প্রয়োগ আছে
+let draft = Object.assign({}, DEFAULTS);   // মডালে এডিট হচ্ছে যেটা
+
+/* ---------- ছবি লোড (যেকোনো ছবি) ---------- */
+let logoSrc = null;   // আপলোড করা ছবি (ছোট করা canvas, স্বচ্ছতা বজায় থাকে) — শুরুতে কোনো ছবি নেই
+const logoReady = Promise.resolve(true);
+
+function setLogoFrom(d) {
+  const sw = d.naturalWidth || d.width || 300, sh = d.naturalHeight || d.height || 300;
+  const k = Math.min(1, 400 / Math.max(sw, sh));            // বিশাল ছবি ছোট করে নেয়, যাতে অনেক QR এও দ্রুত চলে
+  const c = document.createElement('canvas');
+  c.width = Math.max(1, Math.round(sw * k));
+  c.height = Math.max(1, Math.round(sh * k));
+  c.getContext('2d').drawImage(d, 0, 0, c.width, c.height);
+  logoSrc = c;
+  logoMsg(`ছবির আকার: ${sw}×${sh}px` + (k < 1 ? ` (ব্যবহারের জন্য ${c.width}×${c.height}px করা হয়েছে)` : ''));
+}
+function logoMsg(t, err) { const e = $('logoInfo'); e.textContent = t; e.className = 'lm-info' + (err ? ' err' : ''); }
+
+function loadLogoFile(file) {
+  if (!file) return;
+  if (file.type && !file.type.startsWith('image/')) { logoMsg('অনুগ্রহ করে একটি ছবির ফাইল দিন।', true); return; }
+  const fr = new FileReader();
+  fr.onload = () => {
+    const im = new Image();
+    im.onload = () => { setLogoFrom(im); schedulePreview(); };
+    im.onerror = () => tryBitmap(file);          // বিকল্প পদ্ধতি
+    im.src = fr.result;
+  };
+  fr.onerror = () => tryBitmap(file);
+  fr.readAsDataURL(file);
+}
+function tryBitmap(file) {
+  if (window.createImageBitmap) {
+    createImageBitmap(file).then(b => { setLogoFrom(b); schedulePreview(); }).catch(() => logoFail(file));
+  } else logoFail(file);
+}
+function logoFail(file) {
+  const t = file.type || (file.name.split('.').pop() || 'অজানা');
+  logoMsg(`ছবিটি পড়া যায়নি (ফরম্যাট: ${t})। HEIC/HEIF বা নষ্ট ফাইল হলে JPG/PNG করে আবার দিন।`, true);
+}
+function removeLogo() { logoSrc = null; logoMsg('ছবি সরানো হয়েছে — সব QR এ প্রয়োগ করলে ছবি ছাড়া হবে।'); schedulePreview(); }
+
+/* ---------- QR তৈরি ---------- */
+const statusEl = $('status'), grid = $('qrcode-grid');
+function setStatus(msg, isErr) { statusEl.textContent = msg; statusEl.className = isErr ? 'err' : ''; }
+const tick = () => new Promise(r => setTimeout(r, 0));
+
+function buildQR(text) {
+  // সর্বোচ্চ ত্রুটি-সংশোধন (H) দিয়ে শুরু; লেখা খুব বড় হলে ধাপে ধাপে কমবে
+  for (const lvl of ['H', 'Q', 'M', 'L']) {
+    try {
+      const qr = qrcode(0, lvl);
+      qr.addData(text, 'Byte');
+      qr.make();
+      return { qr, lvl };
+    } catch (e) { /* পরের লেভেল */ }
+  }
+  return null;
+}
+
+// ছবির বক্স (px) — অনুপাত ঠিক রেখে, QR এর ভেতরে আটকে রাখে
+function logoRect(n, cell, quiet, c) {
+  const area = n * cell, lo = quiet * cell;
+  const autoRatio = n <= 29 ? 0.34 : n <= 45 ? 0.28 : n <= 65 ? 0.22 : 0.18;   // লেখা বড় = QR ঘন = ছবি ছোট
+  const ratio = c.auto ? autoRatio : c.size / 100;
+  const k = (area * ratio) / Math.max(logoSrc.width, logoSrc.height);
+  const w = Math.max(2, Math.round(logoSrc.width * k)), h = Math.max(2, Math.round(logoSrc.height * k));
+  const pad = Math.max(2, Math.round(cell * 0.8));
+  let x = Math.round(lo + area * c.x / 100 - w / 2);
+  let y = Math.round(lo + area * c.y / 100 - h / 2);
+  x = Math.min(Math.max(x, lo + pad), lo + area - w - pad);
+  y = Math.min(Math.max(y, lo + pad), lo + area - h - pad);
+  return { x, y, w, h, pad, area, lo };
+}
+
+function makeCanvas(text, c) {
+  c = c || cfg;
+  const r = buildQR(text);
+  if (!r) return null;
+  const qr = r.qr, n = qr.getModuleCount(), quiet = 4;
+  const cell = Math.max(3, Math.round(520 / (n + quiet * 2)));
+  const size = (n + quiet * 2) * cell;
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = size;
+  cv.className = 'qr-canvas';
+  const g = cv.getContext('2d');
+  g.fillStyle = qcol.bg; g.fillRect(0, 0, size, size);
+  g.fillStyle = qcol.fg;
+  for (let row = 0; row < n; row++)
+    for (let col = 0; col < n; col++)
+      if (qr.isDark(row, col)) g.fillRect((col + quiet) * cell, (row + quiet) * cell, cell, cell);
+
+  const info = { n, cell, quiet, lvl: r.lvl, logo: false, big: false, finder: false };
+  cv._info = info;
+
+  // ছবি শুধু সর্বোচ্চ ত্রুটি-সংশোধনে (H) বসে, নইলে স্ক্যান নষ্ট হবে
+  if (c.on && r.lvl === 'H' && logoSrc) {
+    const L = logoRect(n, cell, quiet, c);
+    if (c.bg) { g.fillStyle = qcol.bg; g.fillRect(L.x - L.pad, L.y - L.pad, L.w + L.pad * 2, L.h + L.pad * 2); }
+    g.globalAlpha = Math.min(1, Math.max(0.1, c.opacity / 100));
+    g.drawImage(logoSrc, L.x, L.y, L.w, L.h);
+    g.globalAlpha = 1;
+
+    info.logo = true;
+    info.big = ((L.w + L.pad * 2) * (L.h + L.pad * 2)) / (L.area * L.area) > 0.2;
+    const f = 8 * cell, a = L.area, lo = L.lo;
+    const finders = [[lo, lo], [lo + a - f, lo], [lo, lo + a - f]];
+    info.finder = finders.some(([fx, fy]) =>
+      L.x - L.pad < fx + f && L.x + L.w + L.pad > fx && L.y - L.pad < fy + f && L.y + L.h + L.pad > fy);
+  }
+  return cv;
+}
+
+function renderCard(card) {
+  const text = card.dataset.text || '';
+  const box = card.querySelector('.qr-box');
+  const cap = card.querySelector('.caption');
+  box.innerHTML = '';
+  if (cap) cap.innerHTML = '';
+  if (text.trim() === '') return true;
+  const canvas = makeCanvas(text, cfg);
+  if (!canvas) {
+    box.innerHTML = '<div class="qr-err">লেখা অনেক বড় — QR হয়নি</div>';
+    return false;
+  }
+  box.appendChild(canvas);
+  if (cap) {
+    if (card.dataset.idx) { const b = document.createElement('b'); b.textContent = card.dataset.idx + '. '; cap.appendChild(b); }
+    cap.appendChild(document.createTextNode(text));
+  }
+  return true;
+}
+
+/* ---------- হাতে লিখে কোড ---------- */
+function addNewField() {
+  count++;
+  const id = count;
+  const div = document.createElement('div');
+  div.className = 'qrcode-card manual';
+  div.id = 'card-' + id;
+  div.dataset.text = '';
+  div.innerHTML = `
+    <textarea rows="2" class="input-box no-print" id="qrcode-input-${id}" placeholder="টেক্সট বা লিংক লিখুন (১০০+ শব্দ/অক্ষর চলবে)"></textarea>
+    <div class="counter no-print" id="counter-${id}">০ অক্ষর</div>
+    <div class="qr-box"></div>
+    <div class="caption"></div>`;
+  grid.appendChild(div);
+  const ta = div.querySelector('textarea');
+  ta.addEventListener('input', () => {
+    div.dataset.text = ta.value;
+    $('counter-' + id).textContent = ta.value.length.toLocaleString('bn-BD') + ' অক্ষর';
+    renderCard(div);
+  });
+  ta.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); addNewField(); }
+  });
+  ta.focus();
+}
+
+/* ---------- এক্সেল থেকে ---------- */
+function handleExcel(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (typeof XLSX === 'undefined') { setStatus('এক্সেল লাইব্রেরি লোড হয়নি — ইন্টারনেট সংযোগ দেখুন।', true); input.value = ''; return; }
+  setStatus('ফাইল পড়া হচ্ছে...');
+  const reader = new FileReader();
+  reader.onload = async e => {
+    try {
+      const wb = XLSX.read(e.target.result, { type: 'array' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      let rows = XLSX.utils.sheet_to_json(ws, { header: 1, raw: false, defval: '' });
+      if ($('optHeader').checked) rows = rows.slice(1);
+      const values = rows.map(r => String(r[0] == null ? '' : r[0]).trim()).filter(v => v !== '');
+      if (!values.length) { setStatus('প্রথম কলামে কোনো লেখা পাওয়া যায়নি।', true); return; }
+
+      // আগের এক্সেল-কার্ড মুছে নতুন কার্ড বসবে (হাতে লেখা কার্ড থাকবে)
+      grid.querySelectorAll('.qrcode-card.imported').forEach(c => c.remove());
+      await logoReady;
+
+      let failed = 0;
+      const frag = document.createDocumentFragment();
+      const cards = [];
+      values.forEach((v, i) => {
+        const card = document.createElement('div');
+        card.className = 'qrcode-card imported';
+        card.dataset.text = v;
+        card.dataset.idx = String(i + 1);
+        card.innerHTML = '<div class="qr-box"></div><div class="caption"></div>';
+        frag.appendChild(card);
+        cards.push(card);
+      });
+      grid.appendChild(frag);
+
+      for (let i = 0; i < cards.length; i++) {
+        if (!renderCard(cards[i])) failed++;
+        if (i % 20 === 19) { setStatus(`QR তৈরি হচ্ছে... ${i + 1} / ${cards.length}`); await tick(); }
+      }
+      setStatus(`মোট ${cards.length} টি QR কোড তৈরি হয়েছে` + (failed ? ` (${failed} টি লেখা অতিরিক্ত বড় হওয়ায় হয়নি)` : ''), failed > 0);
+    } catch (err) {
+      console.error(err);
+      setStatus('ফাইলটি পড়া যায়নি। .xlsx, .xls বা .csv ফাইল দিন।', true);
+    } finally {
+      input.value = '';
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+/* ---------- অপশন ---------- */
+async function rerenderAll() {
+  const cards = [...grid.querySelectorAll('.qrcode-card')];
+  for (let i = 0; i < cards.length; i++) {
+    renderCard(cards[i]);
+    if (i % 20 === 19) await tick();
+  }
+}
+function toggleLogo() { cfg.on = $('optLogo').checked; rerenderAll(); }
+function toggleText() { document.body.classList.toggle('hide-text', !$('optText').checked); }
+function changeCols() { grid.style.setProperty('--cols', $('optCols').value); }
+function toggleFull() { document.body.classList.toggle('full-text', $('optFull').checked); }
+function setAlign(a) {
+  grid.style.setProperty('--cap-align', a);
+  document.querySelectorAll('#alignSeg button').forEach(b => b.classList.toggle('active', b.dataset.a === a));
+}
+function clearAll() {
+  if (!grid.children.length || confirm('সব QR কোড মুছে ফেলবেন?')) {
+    grid.innerHTML = ''; count = 0; setStatus(''); addNewField();
+  }
+}
+function openInventorModal() { $('inventorModal').style.display = 'flex'; }
+function closeInventorModal() { $('inventorModal').style.display = 'none'; }
+
+/* ---------- ছবি সেটিংস মডাল ---------- */
+function firstText() {
+  const c = [...grid.querySelectorAll('.qrcode-card')].find(x => (x.dataset.text || '').trim() !== '');
+  return c ? c.dataset.text : '';
+}
+function openLogoModal() {
+  draft = Object.assign({}, cfg, { on: true });
+  syncControls();
+  $('logoModal').style.display = 'flex';
+  drawPreview();
+}
+function closeLogoModal() { $('logoModal').style.display = 'none'; }
+
+function syncControls() {
+  $('pvAuto').checked = draft.auto;
+  $('pvSize').value = draft.size;  $('pvSize').disabled = draft.auto;
+  $('pvSizeV').textContent = (draft.auto ? 'অটো' : draft.size + '%');
+  $('pvOp').value = draft.opacity; $('pvOpV').textContent = draft.opacity + '%';
+  $('pvBg').checked = draft.bg;
+  $('pvX').value = draft.x; $('pvY').value = draft.y;
+}
+
+let pvQueued = false;
+function schedulePreview() {
+  if (pvQueued) return;
+  pvQueued = true;
+  requestAnimationFrame(() => { pvQueued = false; drawPreview(); });
+}
+function drawPreview() {
+  const box = $('pvBox'), warn = $('pvWarn');
+  box.innerHTML = '';
+  const cv = makeCanvas(firstText() || 'https://example.com/qr-preview', Object.assign({}, draft, { on: true }));
+  if (!cv) { warn.className = 'pv-warn bad'; warn.textContent = 'প্রিভিউর লেখা অনেক বড় — QR হয়নি।'; return; }
+  box.appendChild(cv);
+  const i = cv._info;
+  if (!logoSrc) { warn.className = 'pv-warn bad'; warn.textContent = 'ছবি নেই — ডানের ঘরে ছবি আপলোড করুন।'; }
+  else if (!i.logo) { warn.className = 'pv-warn bad'; warn.textContent = '⚠ এই লেখাটা এত বড় যে ছবি বসানো গেলে স্ক্যান নষ্ট হবে — তাই ছবি বসছে না।'; }
+  else if (i.finder) { warn.className = 'pv-warn bad'; warn.textContent = '⚠ ছবি QR এর কোণের চৌকো চিহ্ন ঢেকে ফেলেছে — স্ক্যান হবে না। একটু সরান।'; }
+  else if (i.big) { warn.className = 'pv-warn bad'; warn.textContent = '⚠ ছবি অনেক বড় — স্ক্যান নাও হতে পারে। সাইজ কমান বা অপাসিটি কমান।'; }
+  else { warn.className = 'pv-warn ok'; warn.textContent = '✓ আকার ও অবস্থান ঠিক আছে — তবুও প্রয়োগের পর মোবাইলে একবার স্ক্যান করে দেখুন।'; }
+}
+
+function applyLogoSettings() {
+  cfg = Object.assign({}, draft, { on: true });
+  $('optLogo').checked = true;
+  closeLogoModal();
+  setStatus('ছবির সেটিংস প্রয়োগ হচ্ছে...');
+  rerenderAll().then(() => setStatus('ছবির সেটিংস সব QR এ প্রয়োগ হয়েছে ✓'));
+}
+function resetLogoSettings() { draft = Object.assign({}, DEFAULTS); syncControls(); drawPreview(); }
+
+/* ইভেন্ট জোড়া */
+(function wireLogoUI() {
+  const bind = (id, fn) => $(id).addEventListener('input', () => { fn($(id)); syncControls(); schedulePreview(); });
+  bind('pvAuto', el => draft.auto = el.checked);
+  bind('pvSize', el => draft.size = +el.value);
+  bind('pvOp',   el => draft.opacity = +el.value);
+  bind('pvBg',   el => draft.bg = el.checked);
+  bind('pvX',    el => draft.x = +el.value);
+  bind('pvY',    el => draft.y = +el.value);
+
+  // ৯টি অবস্থান বাটন
+  const arrows = ['↖','↑','↗','←','●','→','↙','↓','↘'], pts = [18, 50, 82];
+  const names = ['উপরে-বামে','উপরে','উপরে-ডানে','বামে','মাঝখানে','ডানে','নিচে-বামে','নিচে','নিচে-ডানে'];
+  arrows.forEach((a, i) => {
+    const b = document.createElement('button');
+    b.textContent = a; b.title = names[i];
+    b.onclick = () => { draft.x = pts[i % 3]; draft.y = pts[Math.floor(i / 3)]; syncControls(); schedulePreview(); };
+    $('posGrid').appendChild(b);
+  });
+
+  // ছবি আপলোড / ড্র্যাগ-ড্রপ
+  const drop = $('logoDrop');
+  drop.addEventListener('click', () => $('logoFile').click());
+  $('logoFile').addEventListener('change', e => { loadLogoFile(e.target.files[0]); e.target.value = ''; });
+  ['dragover', 'dragenter'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+  ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
+  drop.addEventListener('drop', e => loadLogoFile(e.dataTransfer.files[0]));
+
+  // প্রিভিউতে টেনে ছবির জায়গা ঠিক করা
+  const pv = $('pvBox');
+  let dragging = false;
+  function moveTo(e) {
+    const cv = pv.firstChild;
+    if (!cv || !cv._info) return;
+    const rc = cv.getBoundingClientRect(), i = cv._info;
+    const area = i.n * i.cell, lo = i.quiet * i.cell;
+    const px = (e.clientX - rc.left) / rc.width * cv.width;
+    const py = (e.clientY - rc.top) / rc.height * cv.height;
+    draft.x = Math.round(Math.min(100, Math.max(0, (px - lo) / area * 100)));
+    draft.y = Math.round(Math.min(100, Math.max(0, (py - lo) / area * 100)));
+    syncControls(); schedulePreview();
+  }
+  pv.addEventListener('pointerdown', e => { dragging = true; pv.classList.add('drag'); pv.setPointerCapture(e.pointerId); moveTo(e); });
+  pv.addEventListener('pointermove', e => { if (dragging) moveTo(e); });
+  ['pointerup', 'pointercancel'].forEach(ev => pv.addEventListener(ev, () => { dragging = false; pv.classList.remove('drag'); }));
+})();
+
+/* ---------- QR এর রং (কাস্টমার নিজের পছন্দমতো বদলাতে পারবে) ---------- */
+const COLOR_DEF = { fg: '#000000', bg: '#ffffff' };
+const PRESETS = [
+  { n: 'কালো', fg: '#000000', bg: '#ffffff' },
+  { n: 'নীল', fg: '#1e3a8a', bg: '#ffffff' },
+  { n: 'সবুজ', fg: '#166534', bg: '#ffffff' },
+  { n: 'লাল', fg: '#991b1b', bg: '#ffffff' },
+  { n: 'বেগুনি', fg: '#581c87', bg: '#ffffff' },
+  { n: 'কালো-হলুদ', fg: '#000000', bg: '#fde68a' },
+  { n: 'নীল-আকাশি', fg: '#0c2d6b', bg: '#dbeafe' }
+];
+let qcol = Object.assign({}, COLOR_DEF);
+const HEX = /^#[0-9a-f]{6}$/i;
+try {
+  const s = JSON.parse(localStorage.getItem('qrcol') || 'null');
+  if (s && HEX.test(s.fg) && HEX.test(s.bg)) qcol = { fg: s.fg, bg: s.bg };
+} catch (e) {}
+
+function lum(h) {
+  const c = [1, 3, 5].map(i => parseInt(h.substr(i, 2), 16) / 255)
+    .map(v => v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4));
+  return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+}
+function contrast(a, b) { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); }
+
+function colorCheck() {
+  const w = $('cWarn');
+  if (lum(qcol.fg) > lum(qcol.bg)) { w.className = 'cwarn bad'; w.textContent = '⚠ কোডের রং ব্যাকগ্রাউন্ডের চেয়ে গাঢ় রাখুন — উল্টো রং সব মোবাইলে স্ক্যান হয় না।'; }
+  else if (contrast(qcol.fg, qcol.bg) < 4) { w.className = 'cwarn bad'; w.textContent = '⚠ দুই রঙের পার্থক্য কম — স্ক্যান নাও হতে পারে।'; }
+  else { w.className = 'cwarn ok'; w.textContent = '✓ রং স্ক্যান-নিরাপদ'; }
+}
+function syncColorInputs() { $('cFg').value = qcol.fg; $('cBg').value = qcol.bg; colorCheck(); }
+function saveColors() { try { localStorage.setItem('qrcol', JSON.stringify(qcol)); } catch (e) {} }
+let colTimer;
+function colorsChanged() {
+  qcol = { fg: $('cFg').value, bg: $('cBg').value };
+  colorCheck(); saveColors();
+  clearTimeout(colTimer);
+  colTimer = setTimeout(() => { rerenderAll(); if ($('logoModal').style.display === 'flex') schedulePreview(); }, 150);
+}
+function setColors(fg, bg) { qcol = { fg: fg, bg: bg }; syncColorInputs(); saveColors(); rerenderAll(); if ($('logoModal').style.display === 'flex') schedulePreview(); }
+function resetColors() { setColors(COLOR_DEF.fg, COLOR_DEF.bg); }
+function initColors() {
+  $('cFg').addEventListener('input', colorsChanged);
+  $('cBg').addEventListener('input', colorsChanged);
+  PRESETS.forEach(p => {
+    const b = document.createElement('button');
+    b.title = p.n;
+    b.style.background = 'linear-gradient(135deg,' + p.bg + ' 50%,' + p.fg + ' 50%)';
+    b.onclick = () => setColors(p.fg, p.bg);
+    $('cPresets').appendChild(b);
+  });
+  syncColorInputs();
+}
+
+window.onload = () => { setAlign('center'); initColors(); addNewField(); };
+
+/* ---------- লগইন গেট ---------- */
+fillBrand('QR জেনারেটর');
+requireLogin().then(u => {
+  if (!u) return;
+  document.getElementById('who').textContent = u.email;
+  document.body.classList.remove('gate');
+});
+</script>
+</body>
+</html>

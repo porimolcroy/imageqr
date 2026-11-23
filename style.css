@@ -1,0 +1,61 @@
+/* ===== সবগুলো পেজের সাধারণ ডিজাইন (রং বদলাতে চাইলে শুধু উপরের :root অংশ বদলান) ===== */
+:root{
+  --brand:#1e40af; --brand-dark:#172554; --brand-2:#2563eb; --accent:#06b6d4;
+  --bg:#f1f5f9; --card:#ffffff; --text:#0f172a; --muted:#64748b; --line:#e2e8f0;
+  --ok:#15803d; --ok-bg:#dcfce7; --bad:#b91c1c; --bad-bg:#fee2e2;
+  --r:14px; --shadow:0 1px 2px rgba(15,23,42,.05),0 10px 28px rgba(15,23,42,.08);
+  --font:"Noto Sans Bengali","Hind Siliguri","Segoe UI",system-ui,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:var(--brand-2)}
+.hide{display:none!important}
+body.gate{display:none}   /* লগইন যাচাই শেষ না হওয়া পর্যন্ত পেজ লুকানো থাকে */
+
+/* বাটন */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 18px;border:0;border-radius:10px;font:600 14px var(--font);cursor:pointer;background:var(--brand-2);color:#fff;text-decoration:none;transition:filter .15s,transform .05s}
+.btn:hover{filter:brightness(1.08)}
+.btn:active{transform:translateY(1px)}
+.btn:disabled{opacity:.65;cursor:not-allowed}
+.btn.ghost{background:#fff;color:var(--brand);border:1px solid var(--line)}
+.btn.green{background:#16a34a}.btn.red{background:#dc2626}.btn.gray{background:#64748b}
+.btn.sm{padding:6px 12px;font-size:12.5px;border-radius:8px}
+
+/* ফর্ম */
+.field{margin-bottom:15px}
+.field label{display:block;margin:0 0 6px;font-size:13.5px;font-weight:600;color:#334155}
+.field .hint{font-weight:400;color:var(--muted);font-size:12.5px}
+.input{width:100%;padding:11px 13px;border:1px solid #cbd5e1;border-radius:10px;font:15px var(--font);background:#fff;color:var(--text);transition:border-color .15s,box-shadow .15s}
+.input:focus{outline:none;border-color:var(--brand-2);box-shadow:0 0 0 3px rgba(37,99,235,.18)}
+
+/* কার্ড ও মেসেজ */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.alert{padding:10px 13px;border-radius:10px;font-size:14px;margin-top:14px}
+.alert.err{background:var(--bad-bg);color:var(--bad)}
+.alert.ok{background:var(--ok-bg);color:var(--ok)}
+.alert.info{background:#eff6ff;color:var(--brand)}
+.badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600;background:#eff6ff;color:var(--brand)}
+.spin{width:15px;height:15px;border:2px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;display:inline-block}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* উপরের বার */
+.appbar{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.94);-webkit-backdrop-filter:saturate(1.4) blur(8px);backdrop-filter:saturate(1.4) blur(8px);border-bottom:1px solid var(--line)}
+.appbar-in{max-width:1100px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px;color:var(--brand-dark);text-decoration:none}
+.logo-mark{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--brand),var(--accent));display:grid;place-items:center;flex:none}
+.app-nav{display:flex;gap:4px;margin-left:8px}
+.navlink{padding:7px 12px;border-radius:8px;color:var(--muted);text-decoration:none;font-size:14px;font-weight:600}
+.navlink:hover{background:#f1f5f9;color:var(--text)}
+.navlink.active{background:#eff6ff;color:var(--brand)}
+.app-user{margin-left:auto;display:flex;align-items:center;gap:10px}
+.chip{background:#eff6ff;color:var(--brand);padding:5px 12px;border-radius:999px;font-size:12.5px;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:640px){.app-nav{order:3;width:100%;margin:0}.chip{max-width:140px}}
+
+.site-foot{text-align:center;color:var(--muted);font-size:12.5px;padding:22px 12px}
+
+/* সংযোগ-সমস্যা স্ক্রিন */
+.fatal{position:fixed;inset:0;z-index:999;background:var(--bg);display:grid;place-items:center;padding:20px}
+.fatal .card{max-width:430px;padding:28px;text-align:center}
+
+@media print{.appbar,.site-foot{display:none!important}}

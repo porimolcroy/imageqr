@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ড্যাশবোর্ড</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+.wrap{max-width:1100px;margin:0 auto;padding:24px 16px 8px}
+.welcome{display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between;align-items:center;padding:24px 26px;background:linear-gradient(135deg,#1e40af,#0e7490);color:#fff;border:0}
+.welcome h1{margin:0 0 4px;font-size:26px}
+.welcome p{margin:0;opacity:.92;word-break:break-all}
+.uid{background:rgba(255,255,255,.16);padding:10px 18px;border-radius:12px;font-size:13px}
+.uid b{display:block;font-size:19px;letter-spacing:.5px}
+h2.sec{font-size:17px;margin:30px 0 12px;color:var(--brand-dark)}
+.tools{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.tool{display:block;padding:22px;text-decoration:none;color:inherit;transition:transform .18s,box-shadow .18s,border-color .18s}
+.tool:hover{transform:translateY(-3px);box-shadow:0 14px 32px rgba(15,23,42,.14);border-color:#bfdbfe}
+.ticon{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--brand),var(--accent));display:grid;place-items:center;margin-bottom:14px}
+.ticon svg{width:26px;height:26px}
+.tool h3{margin:0 0 6px;font-size:18px;color:var(--brand-dark)}
+.tool p{margin:0 0 12px;color:var(--muted);font-size:14px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.tags span{background:#f1f5f9;color:#475569;font-size:12px;padding:3px 10px;border-radius:999px}
+.cta{color:var(--brand-2);font-weight:700;font-size:14px}
+.steps{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;counter-reset:s}
+.steps li{counter-increment:s;position:relative;padding:18px 18px 18px 66px;font-size:14px;color:#334155}
+.steps li::before{content:counter(s,bengali);position:absolute;left:18px;top:16px;width:36px;height:36px;border-radius:50%;background:#eff6ff;color:var(--brand);font-weight:700;display:grid;place-items:center}
+.steps b{display:block;color:var(--text);margin-bottom:2px;font-size:15px}
+</style>
+</head>
+<body class="gate">
+
+<header class="appbar">
+  <div class="appbar-in">
+    <a class="brand" href="main.html"><span class="logo-mark" data-logo></span><span data-brand></span></a>
+    <nav class="app-nav">
+      <a class="navlink active" href="main.html">ড্যাশবোর্ড</a>
+      <a class="navlink" href="qr.html">QR জেনারেটর</a>
+    </nav>
+    <div class="app-user">
+      <span class="chip" id="who"></span>
+      <button class="btn ghost sm" onclick="logout()">লগআউট</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="welcome card">
+    <div>
+      <h1>স্বাগতম 👋</h1>
+      <p><span id="uEmail"></span> হিসেবে প্রবেশ করেছেন</p>
+    </div>
+    <div class="uid">আপনার User ID<b id="uId"></b></div>
+  </section>
+
+  <h2 class="sec">আপনার টুলস</h2>
+  <section class="tools">
+    <a class="tool card" href="qr.html">
+      <div class="ticon"><span data-logo></span></div>
+      <h3>QR কোড জেনারেটর</h3>
+      <p>এক্সেল ফাইলের প্রথম কলামের প্রতিটি লেখা থেকে আলাদা QR কোড তৈরি করুন, মাঝে নিজের ছবি বসান, QR এর রং বদলান এবং A4 পাতায় প্রিন্ট করুন।</p>
+      <div class="tags"><span>এক্সেল আপলোড</span><span>মাঝে ছবি/লোগো</span><span>নিজের পছন্দের রং</span><span>A4 প্রিন্ট</span><span>বাংলা লেখা</span></div>
+      <span class="cta">চালু করুন →</span>
+    </a>
+  </section>
+
+  <h2 class="sec">শুরু করবেন যেভাবে</h2>
+  <ol class="steps">
+    <li class="card"><b>এক্সেল ফাইল প্রস্তুত করুন</b>প্রথম কলামের প্রতিটি ঘরে যা লিখবেন, সেটাই আলাদা QR কোড হবে।</li>
+    <li class="card"><b>আপলোড করে ছবি ঠিক করুন</b>"📂 এক্সেল ফাইল" দিয়ে আপলোড দিন। "🖼 ছবি সেটিংস" থেকে নিজের লোগো বসান।</li>
+    <li class="card"><b>প্রিন্ট বা সেভ করুন</b>"প্রিন্ট (A4)" চাপুন। চাইলে প্রিন্টের জায়গায় PDF হিসেবেও সেভ করা যায়।</li>
+  </ol>
+</main>
+
+<div class="site-foot">© <span data-year></span> <span data-brand></span></div>
+
+<script src="config.js"></script>
+<script>
+fillBrand('ড্যাশবোর্ড');
+requireLogin().then(u => {
+  if (!u) return;
+  document.getElementById('who').textContent = u.email;
+  document.getElementById('uEmail').textContent = u.email;
+  document.getElementById('uId').textContent = u.user_id;
+  document.body.classList.remove('gate');
+});
+</script>
+</body>
+</html>
